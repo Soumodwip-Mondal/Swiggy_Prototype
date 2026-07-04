@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Swiggy · DPDP Consent &amp; Privacy Centre Prototype</title>
+<meta name="description" content="Clickable prototype: DPDP-compliant itemised consent, Teen Mode parental consent, and a self-serve My Data privacy centre for Swiggy.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#16213E">
+<meta property="og:title" content="Swiggy · DPDP Consent Prototype">
+<meta property="og:description" content="Itemised consent, Teen Mode, and a self-serve My Data privacy centre — a product-thinking case study prototype.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2316213E'/%3E%3Ctext x='32' y='42' font-size='30' font-family='Georgia,serif' font-weight='700' fill='%23FC8019' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#16213E; --slate:#3B4E6B; --orange:#FC8019; --orange-dark:#E06D0F;
+    --ink:#1C2331; --mute:#65708A; --line:#E4E7EF; --bg:#F3F4F8; --card:#FFFFFF;
+    --green:#1BA672; --red:#D6493E;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{ height:100%; }
+  body{
+    margin:0; font-family:'Inter',sans-serif; background:
+      radial-gradient(900px 620px at 12% 8%, #223057 0%, rgba(34,48,87,0) 60%),
+      radial-gradient(900px 620px at 88% 92%, #223057 0%, rgba(34,48,87,0) 60%),
+      radial-gradient(1400px 900px at 50% 50%, #14192e 0%, #0a0e1d 100%);
+    min-height:100vh; display:flex; align-items:center; justify-content:center;
+    padding:56px 32px; color:var(--ink); overscroll-behavior:none;
+  }
+  .stage{ display:flex; gap:48px; align-items:center; flex-wrap:wrap; justify-content:center; max-width:1280px; width:100%;}
+  .side-note{ width:280px; color:#C9D2E3; padding-top:18px; flex-shrink:0;}
+  .side-note h1{ font-family:'Fraunces',serif; font-size:22px; color:#fff; margin:0 0 10px; font-weight:600;}
+  .side-note p{ font-size:13px; line-height:1.55; color:#AEB9D1; margin:0 0 14px;}
+  .side-note .tag{ display:inline-block; font-size:10.5px; letter-spacing:.08em; color:var(--orange); font-weight:700; margin-bottom:10px; text-transform:uppercase;}
+  .side-note .step-list{ font-size:12.5px; line-height:1.9; color:#8E9BB8; }
+  .side-note .step-list b{ color:#E7EBF5; }
+  .restart-link{ display:inline-flex; align-items:center; gap:6px; margin-top:18px; font-size:12px; color:#AEB9D1; cursor:pointer; border:1px solid rgba(255,255,255,.18); padding:8px 12px; border-radius:20px; background:rgba(255,255,255,.04);}
+  .restart-link:hover{ color:#fff; border-color:rgba(255,255,255,.35); }
+
+  .phone-wrap{ position:relative; flex-shrink:0; padding:34px; }
+  .phone-wrap::before{
+    content:""; position:absolute; inset:0; border-radius:64px;
+    background:radial-gradient(ellipse at 50% 30%, rgba(255,128,25,.10), rgba(255,128,25,0) 60%);
+    filter:blur(6px); z-index:0;
+  }
+  .phone{
+    width:375px; height:812px; background:#000; border-radius:46px; padding:14px;
+    box-shadow:0 40px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.06), 0 0 0 9px rgba(255,255,255,.02);
+    position:relative; flex-shrink:0; z-index:1;
+  }
+
+  /* Right-side highlight panel — only shown when there's real room for it */
+  .highlight-panel{ display:none; width:270px; flex-shrink:0; padding-top:18px;}
+  .highlight-panel .h-card{ background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.09); border-radius:16px; padding:16px; margin-bottom:12px;}
+  .highlight-panel .h-card .h-num{ display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:8px; background:rgba(252,128,25,.15); color:var(--orange); font-size:12px; font-weight:800; font-family:'Fraunces'; margin-bottom:8px;}
+  .highlight-panel .h-card .h-t{ font-size:13.5px; font-weight:700; color:#fff; margin:0 0 4px;}
+  .highlight-panel .h-card .h-d{ font-size:12px; color:#9AA6C2; line-height:1.5; margin:0;}
+  @media (min-width:1240px){ .highlight-panel{ display:block; } }
+  .screen{
+    width:100%; height:100%; background:var(--bg); border-radius:34px; overflow:hidden;
+    position:relative; display:flex; flex-direction:column;
+  }
+  .notch{
+    position:absolute; top:0; left:50%; transform:translateX(-50%); width:120px; height:26px;
+    background:#000; border-radius:0 0 16px 16px; z-index:50;
+  }
+  .statusbar{ height:44px; flex-shrink:0; display:flex; align-items:flex-end; justify-content:space-between; padding:0 22px 6px; font-size:13px; font-weight:600; color:var(--ink);}
+  .view{ flex:1; overflow-y:auto; display:none; flex-direction:column; -ms-overflow-style:none; scrollbar-width:none;}
+  .view::-webkit-scrollbar{display:none;}
+  .view.active{ display:flex; animation:fade .35s ease; }
+  @keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  /* Mobile: fill the real screen, drop the decorative phone bezel */
+  .mobile-only-bar{ display:none; }
+  @media (max-width: 480px){
+    body{ padding:0; align-items:stretch; background:var(--bg); }
+    .stage{ max-width:none; gap:0; }
+    .side-note{ display:none; }
+    .highlight-panel{ display:none; }
+    .phone-wrap{ padding:0; }
+    .phone-wrap::before{ display:none; }
+    .phone{
+      width:100vw; height:100dvh; border-radius:0; padding:0; box-shadow:none;
+    }
+    .screen{ border-radius:0; }
+    .notch{ display:none; }
+    .statusbar{ display:none; }
+    .screen > .view{ padding-top:0; }
+    .mobile-only-bar{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding:calc(env(safe-area-inset-top, 14px) + 6px) 18px 10px; background:var(--navy); color:#fff;
+      flex-shrink:0; position:relative; z-index:60;
+    }
+    .mobile-only-bar .m-tag{ font-size:10px; letter-spacing:.06em; color:var(--orange); font-weight:700; text-transform:uppercase; }
+    .mobile-only-bar .m-title{ font-size:12.5px; font-weight:600; color:#fff; }
+    .mobile-only-bar .m-restart{ font-size:11px; color:#AEB9D1; border:1px solid rgba(255,255,255,.2); padding:6px 10px; border-radius:16px; }
+    .content{ padding-bottom:calc(28px + env(safe-area-inset-bottom, 0px)); }
+    .tabbar{ padding-bottom:calc(8px + env(safe-area-inset-bottom, 0px)); }
+  }
+
+  .topbar{ padding:6px 20px 14px; display:flex; align-items:center; gap:10px;}
+  .topbar .back{ width:32px; height:32px; border-radius:10px; background:var(--card); display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; border:1px solid var(--line); color:var(--ink);}
+  .topbar h2{ font-size:16px; margin:0; font-weight:700; color:var(--ink); font-family:'Inter'; }
+
+  .brand-row{ display:flex; align-items:center; gap:10px; padding:0 24px; margin-top:4px;}
+  .brand-dot{ width:34px; height:34px; border-radius:10px; background:var(--orange); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-family:'Fraunces'; font-size:16px;}
+
+  .content{ padding:20px 24px 28px; flex:1; }
+  h1.title{ font-family:'Fraunces',serif; font-size:24px; font-weight:600; color:var(--ink); margin:6px 0 8px; line-height:1.2;}
+  p.sub{ font-size:13.5px; color:var(--mute); line-height:1.5; margin:0 0 22px;}
+
+  .field{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px 16px; margin-bottom:12px; }
+
+  .field label{ font-size:11px; color:var(--mute); font-weight:600; text-transform:uppercase; letter-spacing:.04em;}
+  .field input{ border:none; outline:none; font-size:16px; width:100%; margin-top:4px; font-family:'Inter'; color:var(--ink); background:transparent;}
+  .otp-row{ display:flex; gap:10px; margin-bottom:20px;}
+  .otp-box{ width:44px; height:52px; border-radius:12px; background:var(--card); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:700; color:var(--ink);}
+  .otp-box.filled{ border-color:var(--orange); color:var(--orange);}
+
+  .btn{ display:block; width:100%; text-align:center; padding:15px; border-radius:14px; font-weight:700; font-size:15px; cursor:pointer; border:none; font-family:'Inter';}
+  .btn-primary{ background:var(--orange); color:#fff; }
+  .btn-primary:active{ background:var(--orange-dark); }
+  .btn-ghost{ background:transparent; color:var(--mute); font-weight:600; font-size:13.5px; padding:10px; }
+  .btn-outline{ background:var(--card); color:var(--ink); border:1px solid var(--line); }
+
+  .consent-card{ background:var(--card); border-radius:16px; padding:16px; margin-bottom:12px; border:1px solid var(--line); }
+  .consent-card.essential{ background:#EFF6F1; border-color:#CFE7D6; }
+  .consent-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px;}
+  .consent-title{ font-size:14px; font-weight:700; color:var(--ink); margin:0 0 4px;}
+  .consent-desc{ font-size:12px; color:var(--mute); line-height:1.45; margin:0; }
+  .pill{ font-size:10px; font-weight:700; color:var(--green); background:#DCF3E4; padding:3px 8px; border-radius:20px; white-space:nowrap;}
+
+  .toggle{ position:relative; width:46px; height:27px; border-radius:20px; background:#D7DCE6; flex-shrink:0; cursor:pointer; transition:background .2s;}
+  .toggle.on{ background:var(--orange); }
+  .toggle .knob{ position:absolute; top:3px; left:3px; width:21px; height:21px; border-radius:50%; background:#fff; transition:left .2s; box-shadow:0 1px 3px rgba(0,0,0,.25);}
+  .toggle.on .knob{ left:22px; }
+
+  .age-row{ display:flex; gap:10px; margin-bottom:20px; }
+  .age-opt{ flex:1; padding:16px 10px; border-radius:14px; border:1.5px solid var(--line); background:var(--card); text-align:center; font-size:13px; font-weight:600; color:var(--ink); cursor:pointer; }
+  .age-opt.selected{ border-color:var(--orange); background:#FFF3E8; color:var(--orange-dark); }
+
+  /* home screen */
+  .home-header{ background:var(--navy); padding:20px 24px 26px; border-radius:0 0 24px 24px; }
+  .home-header .greet{ color:#AEB9D1; font-size:12.5px; }
+  .home-header .loc{ color:#fff; font-size:16px; font-weight:700; margin-top:2px; display:flex; align-items:center; gap:6px;}
+  .search-fake{ margin-top:16px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:12px 14px; color:#C9D2E3; font-size:13px;}
+  .home-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:18px 24px;}
+  .rest-card{ background:var(--card); border-radius:16px; overflow:hidden; border:1px solid var(--line); }
+  .rest-img{ height:70px; background:linear-gradient(135deg,#FFD9AE,#FC8019); }
+  .rest-body{ padding:10px 12px; }
+  .rest-body .n{ font-size:13px; font-weight:700; }
+  .rest-body .m{ font-size:11px; color:var(--mute); margin-top:2px;}
+
+  .profile-banner{ margin:0 24px 6px; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:14px 16px; display:flex; align-items:center; justify-content:space-between; cursor:pointer;}
+  .profile-banner .l{ display:flex; align-items:center; gap:12px; }
+  .avatar{ width:38px; height:38px; border-radius:50%; background:var(--slate); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px;}
+  .profile-banner .n{ font-size:13.5px; font-weight:700; }
+  .profile-banner .s{ font-size:11px; color:var(--mute);}
+
+  .tabbar{ display:flex; border-top:1px solid var(--line); background:var(--card); padding:10px 0 8px; }
+  .tabbar .tab{ flex:1; text-align:center; font-size:10.5px; color:var(--mute); font-weight:600;}
+  .tabbar .tab.active{ color:var(--orange); }
+  .tabbar .dot{ width:6px; height:6px; border-radius:50%; background:currentColor; margin:0 auto 4px; }
+
+  /* privacy centre */
+  .pc-item{ background:var(--card); border:1px solid var(--line); border-radius:16px; padding:15px 16px; margin-bottom:12px; display:flex; align-items:center; gap:14px; cursor:pointer;}
+  .pc-icon{ width:40px; height:40px; border-radius:11px; background:#FFF3E8; color:var(--orange-dark); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;}
+  .pc-txt .n{ font-size:14px; font-weight:700; color:var(--ink);}
+  .pc-txt .s{ font-size:11.5px; color:var(--mute); margin-top:2px; line-height:1.4;}
+  .pc-arrow{ margin-left:auto; color:var(--mute); font-size:15px;}
+
+  .sla-chip{ display:inline-flex; align-items:center; gap:6px; background:#EAF0FF; color:var(--slate); font-size:10.5px; font-weight:700; padding:5px 10px; border-radius:20px; margin-bottom:16px;}
+
+  .consent-toggle-row{ display:flex; align-items:center; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--line);}
+  .consent-toggle-row:last-child{ border-bottom:none;}
+  .consent-toggle-row .n{ font-size:13.5px; font-weight:600; color:var(--ink);}
+  .consent-toggle-row .s{ font-size:11px; color:var(--mute); margin-top:2px;}
+
+  .confirm-icon{ width:74px; height:74px; border-radius:50%; background:#DCF3E4; color:var(--green); display:flex; align-items:center; justify-content:center; font-size:34px; margin:30px auto 18px;}
+  .confirm-title{ text-align:center; font-family:'Fraunces'; font-size:20px; font-weight:600; margin:0 0 8px;}
+  .confirm-sub{ text-align:center; font-size:13px; color:var(--mute); line-height:1.5; padding:0 12px; margin-bottom:26px;}
+
+  .toast{ position:absolute; left:20px; right:20px; bottom:calc(28px + env(safe-area-inset-bottom, 0px)); background:var(--navy); color:#fff; padding:13px 16px; border-radius:14px; font-size:12.5px; font-weight:600; display:flex; align-items:center; gap:10px; opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; transform:translateY(10px); z-index:80;}
+  .toast.show{ opacity:1; transform:translateY(0); }
+  .toast .tick{ width:20px; height:20px; border-radius:50%; background:var(--green); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:12px; }
+
+  .step-track{ display:flex; gap:6px; padding:0 24px; margin-bottom:6px;}
+  .step-track .seg{ flex:1; height:4px; border-radius:3px; background:var(--line);}
+  .step-track .seg.done{ background:var(--orange); }
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <div class="side-note">
+    <div class="tag">Clickable Prototype</div>
+    <h1>Swiggy — DPDP Consent &amp; Privacy Centre</h1>
+    <p>Happy-path walkthrough of the redesigned sign-up consent flow and the new self-serve "My Data" privacy centre.</p>
+    <div class="step-list">
+      1. Enter phone &amp; verify OTP<br>
+      2. <b>Create profile</b> — name, email, age check<br>
+      3. <b>Itemised consent</b> — essential vs. optional<br>
+      4. Teen Mode branch (if under 18)<br>
+      5. Home screen<br>
+      6. <b>My Data</b> privacy centre<br>
+      7. Manage / withdraw consent<br>
+      8. Download my data<br>
+      9. Erase my data
+    </div>
+    <p style="margin-top:18px;">Tap through the phone to the right. Every screen is live — nothing is a static image.</p>
+    <div class="restart-link" onclick="restartDemo()">↺ Restart demo</div>
+  </div>
+
+  <div class="phone-wrap">
+  <div class="phone">
+    <div class="screen">
+      <div class="notch"></div>
+
+      <div class="mobile-only-bar">
+        <div>
+          <div class="m-tag">Clickable Prototype</div>
+          <div class="m-title">Swiggy · DPDP Consent &amp; My Data</div>
+        </div>
+        <div class="m-restart" onclick="restartDemo()">Restart ↺</div>
+      </div>
+
+      <!-- STATUS BAR (shared) -->
+      <div class="statusbar" style="position:absolute; top:0; left:0; right:0; z-index:40;">
+        <span>9:41</span><span>●●● Swiggy Prototype</span><span>100%</span>
+      </div>
+
+      <!-- 1. PHONE ENTRY -->
+      <div class="view active" id="v-phone">
+        <div style="height:44px;"></div>
+        <div class="content" style="padding-top:60px;">
+          <div class="brand-dot">S</div>
+          <h1 class="title" style="margin-top:22px;">Let's get you fed.</h1>
+          <p class="sub">Enter your mobile number to sign in or create a Swiggy account.</p>
+          <div class="field">
+            <label>Mobile number</label>
+            <input value="+91 98765 43210" readonly>
+          </div>
+          <div style="flex:1;"></div>
+          <button class="btn btn-primary" onclick="go('v-otp')">Send OTP</button>
+        </div>
+      </div>
+
+      <!-- 2. OTP -->
+      <div class="view" id="v-otp">
+        <div style="height:44px;"></div>
+        <div class="topbar"><div class="back" onclick="go('v-phone')">‹</div><h2>Verify number</h2></div>
+        <div class="content">
+          <p class="sub" style="margin-top:0;">Enter the 4-digit code sent to +91 98765 43210</p>
+          <div class="otp-row">
+            <div class="otp-box filled">4</div><div class="otp-box filled">2</div>
+            <div class="otp-box filled">1</div><div class="otp-box filled">7</div>
+          </div>
+          <div style="flex:1;"></div>
+          <button class="btn btn-primary" onclick="go('v-signup')">Verify &amp; continue</button>
+        </div>
+      </div>
+
+      <!-- 2b. SIGN UP / CREATE PROFILE -->
+      <div class="view" id="v-signup">
+        <div style="height:44px;"></div>
+        <div class="topbar"><div class="back" onclick="go('v-otp')">‹</div><h2>Create your profile</h2></div>
+        <div class="content" style="padding-top:0;">
+          <div class="step-track" style="padding:0; margin-bottom:18px;">
+            <div class="seg done"></div><div class="seg done"></div><div class="seg"></div>
+          </div>
+          <p class="sub" style="margin-top:0;">Just the basics — this is separate from what you allow us to do with your data, which comes next.</p>
+
+          <div class="field">
+            <label>Full name</label>
+            <input value="Priya Nair" readonly>
+          </div>
+          <div class="field">
+            <label>Email <span style="font-weight:400; text-transform:none; color:var(--mute);">(for order receipts)</span></label>
+            <input value="priya.nair@email.com" readonly>
+          </div>
+
+          <p style="font-size:11.5px; color:var(--mute); margin:18px 0 6px; font-weight:600;">One quick check — this decides which experience you get</p>
+          <p class="consent-desc" style="margin-bottom:10px;">Are you 18 or older?</p>
+          <div class="age-row">
+            <div class="age-opt selected" id="age-adult" onclick="pickAge('adult')">Yes, I'm 18+</div>
+            <div class="age-opt" id="age-minor" onclick="pickAge('minor')">I'm under 18</div>
+          </div>
+
+          <div style="flex:1;"></div>
+          <button class="btn btn-primary" onclick="go('v-consent')">Continue</button>
+        </div>
+      </div>
+
+      <!-- 3. ITEMISED CONSENT -->
+      <div class="view" id="v-consent">
+        <div style="height:44px;"></div>
+        <div class="topbar"><div class="back" onclick="go('v-signup')">‹</div><h2>Before we start</h2></div>
+        <div class="content" style="padding-top:0;">
+          <div class="step-track" style="padding:0; margin-bottom:18px;">
+            <div class="seg done"></div><div class="seg done"></div><div class="seg done"></div>
+          </div>
+          <p class="sub" style="margin-top:0;">Here's exactly what we need, and what's optional. You're in control — change any of this anytime in <b>My Data</b>.</p>
+
+          <div class="consent-card essential">
+            <div class="consent-head">
+              <div>
+                <p class="consent-title">Order fulfilment &amp; delivery</p>
+                <p class="consent-desc">Address, live location and payment details, used only to get your order to you.</p>
+              </div>
+              <span class="pill">Required</span>
+            </div>
+          </div>
+
+          <div class="consent-card">
+            <div class="consent-head">
+              <div>
+                <p class="consent-title">Marketing messages</p>
+                <p class="consent-desc">Offers &amp; reminders over SMS, WhatsApp and push notifications.</p>
+              </div>
+              <div class="toggle" id="tg-marketing" onclick="toggle(this)"><div class="knob"></div></div>
+            </div>
+          </div>
+
+          <div class="consent-card">
+            <div class="consent-head">
+              <div>
+                <p class="consent-title">Personalised ads</p>
+                <p class="consent-desc">Use your order history to show more relevant restaurants and offers.</p>
+              </div>
+              <div class="toggle" id="tg-ads" onclick="toggle(this)"><div class="knob"></div></div>
+            </div>
+          </div>
+
+          <div class="consent-card">
+            <div class="consent-head">
+              <div>
+                <p class="consent-title">Share with restaurant partners</p>
+                <p class="consent-desc">Let partner restaurants send you their own offers directly.</p>
+              </div>
+              <div class="toggle" id="tg-partner" onclick="toggle(this)"><div class="knob"></div></div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" onclick="continueFromConsent()" style="margin-top:6px;">Continue</button>
+          <p style="text-align:center; font-size:11px; color:var(--mute); margin-top:10px;">Optional items are off by default — only required processing is on.</p>
+        </div>
+      </div>
+
+      <!-- 3b. TEEN MODE PARENTAL CONSENT -->
+      <div class="view" id="v-teen">
+        <div style="height:44px;"></div>
+        <div class="topbar"><div class="back" onclick="go('v-consent')">‹</div><h2>Teen Mode</h2></div>
+        <div class="content" style="padding-top:0;">
+          <div class="sla-chip">🛡️ Verifiable parental consent</div>
+          <h1 class="title" style="font-size:19px;">A parent needs to confirm this account.</h1>
+          <p class="sub">Since you told us you're under 18, we switch on <b>Teen Mode</b>: ordering still works, but marketing, ads and profiling stay off until a parent confirms.</p>
+          <div class="field">
+            <label>Parent / guardian mobile number</label>
+            <input value="+91 90000 11122" readonly>
+          </div>
+          <div class="otp-row">
+            <div class="otp-box filled">7</div><div class="otp-box filled">7</div>
+            <div class="otp-box filled">0</div><div class="otp-box filled">3</div>
+          </div>
+          <p class="consent-desc" style="margin-bottom:16px;">OTP verified by parent. Teen Mode will apply: essential ordering only, no ads or marketing, until account holder turns 18 or a parent changes this in <b>My Data</b>.</p>
+          <div style="flex:1;"></div>
+          <button class="btn btn-primary" onclick="go('v-home')">Confirm &amp; continue</button>
+        </div>
+      </div>
+
+      <!-- 4. HOME -->
+      <div class="view" id="v-home">
+        <div style="height:44px;"></div>
+        <div class="home-header">
+          <div class="greet">Delivering to</div>
+          <div class="loc">📍 Indiranagar, Bengaluru ▾</div>
+          <div class="search-fake">🔍 Search for restaurants, dishes...</div>
+        </div>
+        <div style="padding:16px 24px 0;">
+          <div class="profile-banner" onclick="go('v-privacy')">
+            <div class="l">
+              <div class="avatar">P</div>
+              <div><div class="n">Priya Nair</div><div class="s">Tap to open My Data — privacy centre</div></div>
+            </div>
+            <div class="pc-arrow">›</div>
+          </div>
+        </div>
+        <div class="home-grid">
+          <div class="rest-card"><div class="rest-img"></div><div class="rest-body"><div class="n">Vasudev Adiga's</div><div class="m">South Indian · 32 min</div></div></div>
+          <div class="rest-card"><div class="rest-img" style="background:linear-gradient(135deg,#B7E4C7,#3B4E6B);"></div><div class="rest-body"><div class="n">Truffles</div><div class="m">Burgers · 25 min</div></div></div>
+          <div class="rest-card"><div class="rest-img" style="background:linear-gradient(135deg,#FFC1CC,#E06D0F);"></div><div class="rest-body"><div class="n">Meghana Foods</div><div class="m">Biryani · 40 min</div></div></div>
+          <div class="rest-card"><div class="rest-img" style="background:linear-gradient(135deg,#CDE7FF,#16213E);"></div><div class="rest-body"><div class="n">Third Wave Coffee</div><div class="m">Cafe · 18 min</div></div></div>
+        </div>
+        <div style="flex:1;"></div>
+        <div class="tabbar">
+          <div class="tab active"><div class="dot"></div>Home</div>
+          <div class="tab"><div class="dot" style="background:var(--mute)"></div>Search</div>
+          <div class="tab"><div class="dot" style="background:var(--mute)"></div>Orders</div>
+          <div class="tab" onclick="go('v-privacy')"><div class="dot" style="background:var(--mute)"></div>Account</div>
+        </div>
+      </div>
+
+      <!-- 5. PRIVACY CENTRE -->
+      <div class="view" id="v-privacy">
+        <div style="height:44px;"></div>
+        <div class="topbar"><div class="back" onclick="go('v-home')">‹</div><h2>My Data</h2></div>
+        <div class="content" style="padding-top:0;">
+          <p class="sub" style="margin-top:0;">Everything you need to see, control or remove — in one place, no support ticket required.</p>
+
+          <div class="pc-item" onclick="go('v-consent-manage')">
+            <div class="pc-icon">🎚️</div>
+            <div class="pc-txt"><div class="n">Manage consent</div><div class="s">See and change what you've agreed to</div></div>
+            <div class="pc-arrow">›</div>
+          </div>
+          <div class="pc-item" onclick="go('v-download')">
+            <div class="pc-icon">⬇️</div>
+            <div class="pc-txt"><div class="n">Download my data</div><div class="s">Get a copy of everything Swiggy holds about you</div></div>
+            <div class="pc-arrow">›</div>
+          </div>
+          <div class="pc-item">
+            <div class="pc-icon">✏️</div>
+            <div class="pc-txt"><div class="n">Correct my information</div><div class="s">Fix your name, address or phone number</div></div>
+            <div class="pc-arrow">›</div>
+          </div>
+          <div class="pc-item" onclick="go('v-erase')">
+            <div class="pc-icon">🗑️</div>
+            <div class="pc-txt"><div class="n">Erase my data</div><div class="s">Delete your account or specific data</div></div>
+            <div class="pc-arrow">›</div>
+          </div>
+          <div class="pc-item">
+            <div class="pc-icon">📋</div>
+            <div class="pc-txt"><div class="n">Grievances &amp; requests</div><div class="s">Track any request — resolved within 90 days, usually much sooner</div></div>
+            <div class="pc-arrow">›</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. MANAGE CONSENT -->
+      <div class="view" id="v-consent-manage">
+        <div style="height:44px;"></div>
+        <div class="topbar"><div class="back" onclick="go('v-privacy')">‹</div><h2>Manage consent</h2></div>
+        <div class="content" style="padding-top:0;">
+          <div class="sla-chip">Changes apply instantly</div>
+          <div class="pc-item" style="cursor:default;">
+            <div style="width:100%;">
+              <div class="consent-toggle-row">
+                <div><div class="n">Order fulfilment &amp; delivery</div><div class="s">Required for the app to work</div></div>
+                <span class="pill">Required</span>
+              </div>
+              <div class="consent-toggle-row">
+                <div><div class="n">Marketing messages</div><div class="s">Currently off</div></div>
+                <div class="toggle" id="tg2-marketing" onclick="toggle(this)"><div class="knob"></div></div>
+              </div>
+              <div class="consent-toggle-row">
+                <div><div class="n">Personalised ads</div><div class="s">Currently off</div></div>
+                <div class="toggle" id="tg2-ads" onclick="toggle(this)"><div class="knob"></div></div>
+              </div>
+              <div class="consent-toggle-row">
+                <div><div class="n">Share with restaurant partners</div><div class="s">Currently off</div></div>
+                <div class="toggle" id="tg2-partner" onclick="toggle(this)"><div class="knob"></div></div>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-outline" onclick="withdrawAll()">Withdraw all optional consent</button>
+        </div>
+      </div>
+
+      <!-- 7. DOWNLOAD CONFIRM -->
+      <div class="view" id="v-download">
+        <div style="height:44px;"></div>
+        <div class="topbar"><div class="back" onclick="go('v-privacy')">‹</div><h2>Download my data</h2></div>
+        <div class="content">
+          <div class="confirm-icon">✓</div>
+          <h2 class="confirm-title">Export requested</h2>
+          <p class="confirm-sub">We're packaging your profile, order history and consent records into a machine-readable file. It'll land in your registered email within 24 hours.</p>
+          <button class="btn btn-primary" onclick="go('v-privacy')">Back to My Data</button>
+        </div>
+      </div>
+
+      <!-- 8. ERASE CONFIRM -->
+      <div class="view" id="v-erase">
+        <div style="height:44px;"></div>
+        <div class="topbar"><div class="back" onclick="go('v-privacy')">‹</div><h2>Erase my data</h2></div>
+        <div class="content" style="padding-top:14px;">
+          <div class="consent-card">
+            <p class="consent-title">What gets erased</p>
+            <p class="consent-desc">Profile, saved addresses, payment tokens and marketing data.</p>
+          </div>
+          <div class="consent-card essential">
+            <p class="consent-title">What we must keep</p>
+            <p class="consent-desc">Invoices are retained for the period required under tax law, even after erasure — we'll always tell you when this applies.</p>
+          </div>
+          <div style="flex:1;"></div>
+          <button class="btn btn-primary" style="background:var(--red);" onclick="go('v-erase-confirm')">Confirm erasure request</button>
+          <button class="btn btn-ghost" onclick="go('v-privacy')">Cancel</button>
+        </div>
+      </div>
+
+      <!-- 9. ERASE CONFIRMED -->
+      <div class="view" id="v-erase-confirm">
+        <div style="height:44px;"></div>
+        <div class="content">
+          <div class="confirm-icon">✓</div>
+          <h2 class="confirm-title">Erasure request logged</h2>
+          <p class="confirm-sub">Tracked as request #SW-88213. We'll confirm by email once complete — well within our 90-day (target: 7-day) commitment.</p>
+          <button class="btn btn-primary" onclick="go('v-privacy')">Back to My Data</button>
+        </div>
+      </div>
+
+      <div class="toast" id="toast"><div class="tick">✓</div><span id="toast-text">Saved</span></div>
+    </div>
+  </div>
+  </div>
+
+  <div class="highlight-panel">
+    <div class="h-card">
+      <div class="h-num">1</div>
+      <div class="h-t">Itemised, layered consent</div>
+      <p class="h-d">Essential processing on by default; marketing, ads and partner-sharing are separate, off-by-default toggles.</p>
+    </div>
+    <div class="h-card">
+      <div class="h-num">2</div>
+      <div class="h-t">"My Data" privacy centre</div>
+      <p class="h-d">Download, correct, withdraw or erase — self-serve, with a visible resolution timer instead of a support ticket.</p>
+    </div>
+    <div class="h-card">
+      <div class="h-num">3</div>
+      <div class="h-t">Teen Mode by default</div>
+      <p class="h-d">Under-18 sign-ups need a parent's OTP before ads or profiling switch on — ordering still works either way.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+function go(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById(id).scrollTop = 0;
+}
+function toggle(el){ el.classList.toggle('on'); showToast(el.classList.contains('on') ? 'Consent turned on' : 'Consent withdrawn'); }
+function pickAge(which){
+  document.getElementById('age-adult').classList.toggle('selected', which==='adult');
+  document.getElementById('age-minor').classList.toggle('selected', which==='minor');
+  window.__age = which;
+}
+function continueFromConsent(){
+  if(window.__age === 'minor'){ go('v-teen'); } else { go('v-home'); }
+}
+function withdrawAll(){
+  ['tg2-marketing','tg2-ads','tg2-partner'].forEach(id=>document.getElementById(id).classList.remove('on'));
+  showToast('All optional consent withdrawn');
+}
+function restartDemo(){
+  document.querySelectorAll('.toggle').forEach(t=>t.classList.remove('on'));
+  pickAge('adult');
+  go('v-phone');
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  document.getElementById('toast-text').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(()=>t.classList.remove('show'), 1800);
+}
+</script>
+</body>
+</html>
